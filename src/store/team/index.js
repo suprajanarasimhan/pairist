@@ -192,8 +192,8 @@ export default {
       }
     },
 
-    recommendPairs ({ commit, dispatch, getters }) {
-      const moves = calculateMovesToBestPairing({
+    async recommendPairs ({ commit, dispatch, getters }) {
+      const moves = await calculateMovesToBestPairing({
         history: getters['history/all'].slice(),
         current: {
           entities: getters['entities/all'].slice(),

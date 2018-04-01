@@ -223,7 +223,7 @@ export const allPossibleAssignments = function * ({ current }) {
   })
 }
 
-export const calculateMovesToBestPairing = ({ current, history }) => {
+export const calculateMovesToBestPairing = async ({ current, history }) => {
   const laneKeys = current.lanes.filter(l => !l.locked).map(key)
   let optimizedHistory = []
   const people = current.entities.filter(e =>
@@ -285,31 +285,37 @@ export const calculateMovesToBestPairing = ({ current, history }) => {
   const trackScoreLedger = calculateTrackScores({ current, history })
 
   const assts = allPossibleAssignments({ current })
-  let nextAssignment = assts.next()
-  if (nextAssignment.done) {
-    return []
-  }
-  let bestPairing = nextAssignment.value
+  const worker = async ({ assignmentGenerator, trackScoreLedger, peopleKeys }) => {
+    let nextAssignment = assts.next()
+    if (nextAssignment.done) {
+      return []
+    }
+    let bestPairing = nextAssignment.value
 
-  let highestScore = scorePairing({ pairing: bestPairing.map(a => a[0]), peopleKeys, scores }).multiply(
-    trackScoreAssignments({ current, trackScoreLedger, assignments: bestPairing })
-  )
-
-  let assignment = bestPairing
-  while (!nextAssignment.done) {
-    assignment = nextAssignment.value
-    const pairing = assignment.map(a => a[0])
-
-    const pairScore = scorePairing({ pairing, peopleKeys, scores }).multiply(
-      trackScoreAssignments({ current, trackScoreLedger, assignments: assignment })
+    let highestScore = scorePairing({ pairing: bestPairing.map(a => a[0]), peopleKeys, scores }).multiply(
+      trackScoreAssignments({ current, trackScoreLedger, assignments: bestPairing })
     )
 
-    if (pairScore > highestScore) {
-      bestPairing = assignment
-      highestScore = pairScore
+    let assignment = bestPairing
+    while (!nextAssignment.done) {
+      assignment = nextAssignment.value
+      const pairing = assignment.map(a => a[0])
+
+      const pairScore = scorePairing({ pairing, peopleKeys, scores }).multiply(
+        trackScoreAssignments({ current, trackScoreLedger, assignments: assignment })
+      )
+
+      // console.log(pairScore, assignment)
+      if (pairScore > highestScore) {
+        bestPairing = assignment
+        highestScore = pairScore
+      }
+      nextAssignment = assts.next()
     }
-    nextAssignment = assts.next()
+    return bestPairing
   }
+
+  let bestPairing = await worker({ assignmentGenerator: assts, trackScoreLedger, peopleKeys })
 
   return getMoves({ match: bestPairing, lanes })
 }

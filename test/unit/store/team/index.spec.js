@@ -341,7 +341,7 @@ describe('Team Store', () => {
     })
 
     describe('recommendPairs', () => {
-      it('dispatches applyMoves with recommended moves', () => {
+      it('dispatches applyMoves with recommended moves', async () => {
         const dispatch = jest.fn()
         const commit = jest.fn()
         const getters = {
@@ -353,7 +353,7 @@ describe('Team Store', () => {
 
         global.calculateMovesToBestPairing.mockReturnValue(moves)
 
-        store.actions.recommendPairs({ commit, dispatch, getters })
+        await store.actions.recommendPairs({ commit, dispatch, getters })
 
         expect(global.calculateMovesToBestPairing).toHaveBeenCalledTimes(1)
         expect(global.calculateMovesToBestPairing).toHaveBeenCalledWith({
@@ -369,7 +369,7 @@ describe('Team Store', () => {
         expect(commit).toHaveBeenCalledTimes(0)
       })
 
-      it('notifies when pairing assignment is already optimal', () => {
+      it('notifies when pairing assignment is already optimal', async () => {
         const dispatch = jest.fn()
         const commit = jest.fn()
         const getters = {
@@ -381,7 +381,7 @@ describe('Team Store', () => {
 
         global.calculateMovesToBestPairing.mockReturnValue(moves)
 
-        store.actions.recommendPairs({ commit, dispatch, getters })
+        await store.actions.recommendPairs({ commit, dispatch, getters })
 
         expect(global.calculateMovesToBestPairing).toHaveBeenCalledTimes(1)
         expect(dispatch).toHaveBeenCalledTimes(1)
@@ -393,7 +393,7 @@ describe('Team Store', () => {
         })
       })
 
-      it('notifies no pairing assignment can be made', () => {
+      it('notifies no pairing assignment can be made', async () => {
         const dispatch = jest.fn()
         const commit = jest.fn()
         const getters = {
@@ -405,7 +405,7 @@ describe('Team Store', () => {
 
         global.calculateMovesToBestPairing.mockReturnValue(moves)
 
-        store.actions.recommendPairs({ commit, dispatch, getters })
+        await store.actions.recommendPairs({ commit, dispatch, getters })
 
         expect(global.calculateMovesToBestPairing)
           .toHaveBeenCalledWith({ history: [], current: { entities: [], lanes: [] } })

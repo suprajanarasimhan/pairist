@@ -134,8 +134,8 @@ describe('Recommendation', () => {
   })
 
   describe('calculateMovesToBestPairing', () => {
-    it('does not blow up if history is not set', () => {
-      const bestPairing = Recommendation.calculateMovesToBestPairing({
+    it('does not blow up if history is not set', async () => {
+      const bestPairing = await Recommendation.calculateMovesToBestPairing({
         current: {
           entities: [{ '.key': 'p1', 'type': 'person', 'location': 'l1' }],
           lanes: [{ '.key': 'l1' }],
@@ -145,8 +145,8 @@ describe('Recommendation', () => {
       expect(bestPairing).toEqual([])
     })
 
-    it("returns the single possibility if there's only one", () => {
-      const bestPairing = Recommendation.calculateMovesToBestPairing({
+    it("returns the single possibility if there's only one", async () => {
+      const bestPairing = await Recommendation.calculateMovesToBestPairing({
         current: {
           entities: [
             { '.key': 'p1', 'type': 'person', 'location': 'l1' },
@@ -160,8 +160,8 @@ describe('Recommendation', () => {
       expect(bestPairing).toEqual([])
     })
 
-    it('assigns people with context to the right lanes', () => {
-      const bestPairing = Recommendation.calculateMovesToBestPairing({
+    it('assigns people with context to the right lanes', async () => {
+      const bestPairing = await Recommendation.calculateMovesToBestPairing({
         current: {
           entities: [
             { '.key': 'p1', 'type': 'person', 'location': 'l1' },
@@ -218,8 +218,8 @@ describe('Recommendation', () => {
       ])
     })
 
-    it('fills in empty lanes first', () => {
-      const bestPairing = Recommendation.calculateMovesToBestPairing({
+    it('fills in empty lanes first', async () => {
+      const bestPairing = await Recommendation.calculateMovesToBestPairing({
         current: {
           entities: [
             { '.key': 'p1', 'type': 'person', 'location': 'l1' },
@@ -272,13 +272,13 @@ describe('Recommendation', () => {
         {
           lane: 'new-lane',
           entities: ['p4'],
-        }
+        },
       ])
     })
 
     describe('with 3 people', () => {
-      it("pairs the two that haven't paired together the longest", () => {
-        const bestPairing = Recommendation.calculateMovesToBestPairing({
+      it("pairs the two that haven't paired together the longest", async () => {
+        const bestPairing = await Recommendation.calculateMovesToBestPairing({
           current: {
             entities: [
               { '.key': 'p1', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
@@ -323,8 +323,8 @@ describe('Recommendation', () => {
         ])
       })
 
-      it('assigns people with context to the right lanes', () => {
-        const bestPairing = Recommendation.calculateMovesToBestPairing({
+      it('assigns people with context to the right lanes', async () => {
+        const bestPairing = await Recommendation.calculateMovesToBestPairing({
           current: {
             entities: [
               { '.key': 'p1', 'type': 'person', 'location': 'l1' },
@@ -383,8 +383,8 @@ describe('Recommendation', () => {
     })
 
     describe('with people out', () => {
-      it("pairs the two that haven't paired together the longest", () => {
-        const bestPairing = Recommendation.calculateMovesToBestPairing({
+      it("pairs the two that haven't paired together the longest", async () => {
+        const bestPairing = await Recommendation.calculateMovesToBestPairing({
           current: {
             entities: [
               { '.key': 'p1', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
@@ -423,8 +423,8 @@ describe('Recommendation', () => {
     })
 
     describe('with locked lanes', () => {
-      it('ignores locked lanes completely', () => {
-        const bestPairing = Recommendation.calculateMovesToBestPairing({
+      it('ignores locked lanes completely', async () => {
+        const bestPairing = await Recommendation.calculateMovesToBestPairing({
           current: {
             entities: [
               { '.key': 'p1', 'type': 'person', 'location': 'l1' },
@@ -459,8 +459,8 @@ describe('Recommendation', () => {
         expect(bestPairing).toEqual([])
       })
 
-      it("even when they're empty", () => {
-        const bestPairing = Recommendation.calculateMovesToBestPairing({
+      it("even when they're empty", async () => {
+        const bestPairing = await Recommendation.calculateMovesToBestPairing({
           current: {
             entities: [
               { '.key': 'p1', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
@@ -506,8 +506,8 @@ describe('Recommendation', () => {
     })
 
     describe('multiple solos', () => {
-      it('does not pair them together', () => {
-        const bestPairing = Recommendation.calculateMovesToBestPairing({
+      it('does not pair them together', async () => {
+        const bestPairing = await Recommendation.calculateMovesToBestPairing({
           current: {
             entities: [
               { '.key': 'p1', 'type': 'person', 'location': 'l1' },
@@ -574,34 +574,34 @@ describe('Recommendation', () => {
       })
     })
 
-    describe('fuzz pairing static (repro from interesting failures)', () => {
-      it('fuzz 1', () => {
+    describe('fuzz pairing static (repro from interesting failures)', async () => {
+      it('fuzz 1', async () => {
         const board = require('./fixtures/board-from-fuzz-1.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
       })
 
-      it('fuzz 2', () => {
+      it('fuzz 2', async () => {
         const board = require('./fixtures/board-from-fuzz-2.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
       })
 
-      it('fuzz 3', () => {
+      it('fuzz 3', async () => {
         const board = require('./fixtures/board-from-fuzz-3.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
       })
 
-      it('fuzz 4', () => {
+      it('fuzz 4', async () => {
         const board = require('./fixtures/board-from-fuzz-4.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
       })
 
-      it('fuzz 5', () => {
+      it('fuzz 5', async () => {
         const board = require('./fixtures/board-from-fuzz-5.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
         const people = board.current.entities.filter(e => e.type === 'person')
         const emptyLanes = board.current.lanes.filter(l =>
@@ -609,9 +609,9 @@ describe('Recommendation', () => {
         expect(bestPairing.some(move => emptyLanes.includes(move.lane))).toBeTruthy()
       })
 
-      it('fuzz 6', () => {
+      it('fuzz 6', async () => {
         const board = require('./fixtures/board-from-fuzz-6.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
         const people = board.current.entities.filter(e => e.type === 'person')
         const emptyLanes = board.current.lanes.filter(l =>
@@ -619,32 +619,32 @@ describe('Recommendation', () => {
         expect(bestPairing.some(move => emptyLanes.includes(move.lane)) || bestPairing.length === 0).toBeTruthy()
       })
 
-      it('fuzz 7', () => {
+      it('fuzz 7', async () => {
         const board = require('./fixtures/board-from-fuzz-7.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
         expect(_.flatten(bestPairing.map(p => p.entities)).length).toBeGreaterThanOrEqual(6)
       })
 
-      it('fuzz 8', () => {
+      it('fuzz 8', async () => {
         const board = require('./fixtures/board-from-fuzz-8.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
         expect(_.flatten(bestPairing.map(p => p.entities)).length).toBeGreaterThanOrEqual(3)
       })
 
-      it('fuzz 9', () => {
+      it('fuzz 9', async () => {
         const board = require('./fixtures/board-from-fuzz-9.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
         expect(_.flatten(bestPairing.map(p => p.entities)).length).toBeGreaterThanOrEqual(
           board.current.entities.filter(e => e.type === 'person' && e.location === constants.LOCATION.UNASSIGNED).length
         )
       })
 
-      it('fuzz 10', () => {
+      it('fuzz 10', async () => {
         const board = require('./fixtures/board-from-fuzz-10.json')
-        const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+        const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
         expect(bestPairing).toBeTruthy()
         expect(_.flatten(bestPairing.map(p => p.entities)).length).toBeGreaterThanOrEqual(
           board.current.entities.filter(e => e.type === 'person' && e.location === constants.LOCATION.UNASSIGNED).length
@@ -652,9 +652,9 @@ describe('Recommendation', () => {
       })
     })
 
-    describe('fuzz pairing', () => {
+    describe('fuzz pairing', async () => {
       for (let i = 0; i < 500; i++) {
-        it(`fuzz #${i}`, () => {
+        it(`fuzz #${i}`, async () => {
           const peopleCount = randomInt(10)
           const outCount = randomInt(4)
           const lanesCount = randomInt(5)
@@ -670,7 +670,7 @@ describe('Recommendation', () => {
           const board = generateBoard(config)
 
           fs.writeFileSync(`/tmp/pairist-fuzz-pairing/board-${i}.json`, JSON.stringify(board), 'utf-8')
-          const bestPairing = Recommendation.calculateMovesToBestPairing(board)
+          const bestPairing = await Recommendation.calculateMovesToBestPairing(board)
           if (lanesCount * 2 - 1 > peopleCount) {
             // too many lanes
             assert.equal(bestPairing, undefined, JSON.stringify({ config, current: board.current }))
@@ -707,9 +707,9 @@ describe('Recommendation', () => {
     })
   })
 
-  describe('track rotation', () => {
-    it("rotates people onto tracks they haven't worked on much", () => {
-      const bestPairing1 = Recommendation.calculateMovesToBestPairing({
+  describe('track rotation', async () => {
+    it("rotates people onto tracks they haven't worked on much", async () => {
+      const bestPairing1 = await Recommendation.calculateMovesToBestPairing({
         current: {
           entities: [
             { '.key': 'p1', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
@@ -756,8 +756,8 @@ describe('Recommendation', () => {
       ])
     })
 
-    it('weights recent context more heavily', () => {
-      const bestPairing1 = Recommendation.calculateMovesToBestPairing({
+    it('weights recent context more heavily', async () => {
+      const bestPairing1 = await Recommendation.calculateMovesToBestPairing({
         current: {
           entities: [
             { '.key': 'p1', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
@@ -808,8 +808,8 @@ describe('Recommendation', () => {
       ])
     })
 
-    it('recommends individuals who are unassigned', () => {
-      const bestPairing = Recommendation.calculateMovesToBestPairing({
+    it('recommends individuals who are unassigned', async () => {
+      const bestPairing = await Recommendation.calculateMovesToBestPairing({
         current: {
           entities: [
             { '.key': 'p1', 'type': 'person', 'location': 'l1' },
@@ -879,8 +879,8 @@ describe('Recommendation', () => {
       ])
     })
 
-    it('returns an empty array when already optimal', () => {
-      const bestPairing = Recommendation.calculateMovesToBestPairing({
+    it('returns an empty array when already optimal', async () => {
+      const bestPairing = await Recommendation.calculateMovesToBestPairing({
         current: {
           entities: [
             { '.key': 'p1', 'type': 'person', 'location': 'l1' },

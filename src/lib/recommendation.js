@@ -312,10 +312,14 @@ export const calculateMovesToBestPairing = async ({ current, history }) => {
       }
       nextAssignment = assts.next()
     }
-    return bestPairing
+    return [highestScore, bestPairing]
   }
 
-  let bestPairing = await worker({ assignmentGenerator: assts, trackScoreLedger, peopleKeys })
+  let bestPairing = _.maxBy([
+    await worker({ assignmentGenerator: assts, trackScoreLedger, peopleKeys }),
+    await worker({ assignmentGenerator: assts, trackScoreLedger, peopleKeys }),
+    await worker({ assignmentGenerator: assts, trackScoreLedger, peopleKeys }),
+  ], ([score, pairing]) => score)[1]
 
   return getMoves({ match: bestPairing, lanes })
 }

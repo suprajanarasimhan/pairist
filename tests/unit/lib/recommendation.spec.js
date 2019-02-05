@@ -274,7 +274,7 @@ describe('Recommendation', () => {
         ],
       })
 
-      expect(normalizePairing(bestPairing)).toEqual([
+      expect(normalizePairing(bestPairing)).toEqual(normalizePairing([
         {
           lane: 'l2',
           entities: ['p3', 'p5'],
@@ -283,7 +283,7 @@ describe('Recommendation', () => {
           lane: 'new-lane',
           entities: ['p4'],
         },
-      ])
+      ]))
     })
 
     describe('with 3 people', () => {
@@ -321,7 +321,7 @@ describe('Recommendation', () => {
           ],
         })
 
-        expect(normalizePairing(bestPairing)).toEqual([
+        expect(normalizePairing(bestPairing)).toEqual(normalizePairing([
           {
             lane: 'new-lane',
             entities: ['p1'],
@@ -330,30 +330,41 @@ describe('Recommendation', () => {
             lane: 'new-lane',
             entities: ['p2', 'p3'],
           },
-        ])
+        ]))
       })
 
       it('when scores are tied, it does not always pair the same people', () => {
-        const bestPairings = []
-        while (bestPairings.length < 20) {
-          bestPairings.push(Recommendation.calculateMovesToBestPairing({
-            current: {
-              entities: [
-                { '.key': 'p1', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
-                { '.key': 'p2', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
-                { '.key': 'p3', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
-              ],
-              lanes: [],
-            },
-            history: [],
-          }))
+        const generateLotsOfPairings = () => {
+          const bestPairings = []
+          while (bestPairings.length < 20) {
+            bestPairings.push(JSON.stringify(normalizePairing(Recommendation.calculateMovesToBestPairing({
+              current: {
+                entities: [
+                  { '.key': 'p1', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
+                  { '.key': 'p2', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
+                  { '.key': 'p3', 'type': 'person', 'location': constants.LOCATION.UNASSIGNED },
+                ],
+                lanes: [],
+              },
+              history: [],
+            }))))
+          }
+          return bestPairings
         }
 
-        expect(_.uniq(bestPairings.map(ps => normalizePairing(ps)).map(JSON.stringify)).sort()).toEqual([
-          '[{"lane":"new-lane","entities":["p1"]},{"lane":"new-lane","entities":["p2","p3"]}]',
-          '[{"lane":"new-lane","entities":["p2"]},{"lane":"new-lane","entities":["p1","p3"]}]',
-          '[{"lane":"new-lane","entities":["p3"]},{"lane":"new-lane","entities":["p1","p2"]}]',
-        ])
+        const bestPairingsSerializedAsJSON = generateLotsOfPairings()
+
+        const uniqAllThePairings = (pairingsSerializedAsJSON) => (
+          new Set(
+            [...new Set(pairingsSerializedAsJSON)].map(JSON.parse).map(normalizePairing),
+          )
+        )
+
+        expect(uniqAllThePairings(bestPairingsSerializedAsJSON)).toEqual(new Set([
+          normalizePairing([{ lane: 'new-lane', entities: ['p1'] }, { lane: 'new-lane', entities: ['p2', 'p3'] }]),
+          normalizePairing([{ lane: 'new-lane', entities: ['p2'] }, { lane: 'new-lane', entities: ['p1', 'p3'] }]),
+          normalizePairing([{ lane: 'new-lane', entities: ['p3'] }, { lane: 'new-lane', entities: ['p1', 'p2'] }]),
+        ]))
       })
 
       it('avoids pairing people who have an affinity such that they should not be paired', () => {
@@ -402,7 +413,7 @@ describe('Recommendation', () => {
           ],
         })
 
-        expect(normalizePairing(bestPairing)).toEqual([
+        expect(normalizePairing(bestPairing)).toEqual(normalizePairing([
           {
             lane: 'new-lane',
             entities: ['p2'],
@@ -411,7 +422,7 @@ describe('Recommendation', () => {
             lane: 'new-lane',
             entities: ['p1', 'p3'],
           },
-        ])
+        ]))
       })
     })
 
@@ -446,12 +457,12 @@ describe('Recommendation', () => {
           ],
         })
 
-        expect(normalizePairing(bestPairing)).toEqual([
+        expect(normalizePairing(bestPairing)).toEqual(normalizePairing([
           {
             lane: 'new-lane',
             entities: ['p1', 'p2'],
           },
-        ])
+        ]))
       })
     })
 
@@ -590,7 +601,7 @@ describe('Recommendation', () => {
           ],
         })
 
-        expect(normalizePairing(bestPairing)).toEqual([
+        expect(normalizePairing(bestPairing)).toEqual(normalizePairing([
           {
             lane: 'l1',
             entities: ['p5'],
@@ -603,7 +614,7 @@ describe('Recommendation', () => {
             lane: 'l3',
             entities: ['p4'],
           },
-        ])
+        ]))
       })
     })
 
@@ -1222,10 +1233,10 @@ const measureAllocations = ({ current, history }) => {
 }
 
 const normalizePairing = (pairing) => {
-  return pairing.map(p => {
+  return new Set(pairing.map(p => {
     return {
       lane: p.lane,
-      entities: p.entities.sort(),
+      entities: new Set(p.entities.sort()),
     }
-  }).sort((a, b) => a.lane < b.lane ? -1 : 1)
+  }))
 }

@@ -1,5 +1,6 @@
 import { firebaseMutations, firebaseAction } from 'vuexfire'
 import _ from 'lodash/fp'
+import moment from 'moment'
 
 import constants from '@/lib/constants'
 
@@ -64,7 +65,7 @@ export default {
         const entityToCreate = {
           ...entity,
           location: constants.LOCATION.UNASSIGNED,
-          updatedAt: Date.now(),
+          updatedAt: moment().valueOf(),
         }
 
         state.ref.push(entityToCreate)
@@ -93,7 +94,7 @@ export default {
 
       const payload = {
         location,
-        updatedAt: Date.now(),
+        updatedAt: moment().valueOf(),
       }
 
       state.ref.child(key).update(payload)

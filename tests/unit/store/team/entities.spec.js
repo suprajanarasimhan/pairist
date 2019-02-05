@@ -72,7 +72,7 @@ describe('Entities Store', () => {
 
   describe('actions', () => {
     describe('save', () => {
-      it('pushes a new entity into the ref', () => {
+      fit('pushes a new entity into the ref', () => {
         const push = jest.fn()
         const state = { ref: { push } }
 

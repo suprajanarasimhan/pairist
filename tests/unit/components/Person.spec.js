@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
+import Vue from 'vue'
 import flushPromises from 'flush-promises'
 import Vuex from 'vuex'
 import Vuetify from 'vuetify'
@@ -7,7 +8,7 @@ import Person from '@/components/team/Person'
 const localVue = createLocalVue()
 
 localVue.use(Vuex)
-localVue.use(Vuetify)
+Vue.use(Vuetify)
 
 jest.mock('@/assets/no-picture.svg', () => {
   return 'no-picture.svg'
@@ -41,7 +42,7 @@ describe('Person', () => {
     shallowMount(Person, { store,
       localVue,
       propsData: {
-        person: { '.key': 'p1', 'name': 'Bart' },
+        person: { id: 'p1', name: 'Bart' },
       },
     })
   })
@@ -50,7 +51,7 @@ describe('Person', () => {
     const wrapper = shallowMount(Person, { store,
       localVue,
       propsData: {
-        person: { '.key': 'p1', 'name': 'Lisa', 'picture': 'lisas-picture.png' },
+        person: { id: 'p1', name: 'Lisa', picture: 'lisas-picture.png' },
       },
     })
 
@@ -62,7 +63,7 @@ describe('Person', () => {
     const wrapper = shallowMount(Person, { store,
       localVue,
       propsData: {
-        person: { '.key': 'p2', 'name': 'Bob' },
+        person: { id: 'p2', name: 'Bob' },
       },
     })
 
@@ -74,7 +75,7 @@ describe('Person', () => {
     const wrapper = shallowMount(Person, { store,
       localVue,
       propsData: {
-        person: { '.key': 'p2', 'name': 'Error' },
+        person: { id: 'p2', name: 'Error', picture: 'does not exist' },
       },
     })
 
@@ -87,7 +88,7 @@ describe('Person', () => {
   })
 
   it("updates name's font size based on length", async () => {
-    const person = { '.key': 'p3', 'name': 'N' }
+    const person = { id: 'p3', name: 'N' }
     const wrapper = shallowMount(Person, { store,
       localVue,
       propsData: {
@@ -119,7 +120,7 @@ describe('Person', () => {
     const wrapper = shallowMount(Person, { store,
       localVue,
       propsData: {
-        person: { '.key': 'p', 'name': 'Person' },
+        person: { id: 'p', name: 'Person' },
       },
     })
 

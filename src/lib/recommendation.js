@@ -103,7 +103,7 @@ export const mergePairsScores = (scores, pairs) => {
   return merged
 }
 
-const key = e => e['.key']
+const key = e => e.id
 
 export const allPossibleAssignments = function * ({ current }) {
   const laneKeys = current.lanes.filter(l => !l.locked).map(key)
@@ -297,7 +297,7 @@ export const calculateMovesToBestPairing = ({ current, history }) => {
   let maxScore = 0
 
   if (history && history.length > 0) {
-    maxScore = bigInt(parseInt(_.last(history)['.key']))
+    maxScore = bigInt(parseInt(_.last(history).id))
 
     optimizedHistory = history.map(h => {
       const groups = _.groupBy(h.entities.filter(e =>
@@ -306,7 +306,7 @@ export const calculateMovesToBestPairing = ({ current, history }) => {
         e.location !== constants.LOCATION.OUT
       ), 'location')
       const lanes = []
-      const score = bigInt(maxScore).subtract(parseInt(h['.key']))
+      const score = bigInt(maxScore).subtract(parseInt(h.id))
 
       Object.values(groups).forEach(people => {
         people = people.map(key)
@@ -401,7 +401,7 @@ export const calculateMovesToBestAssignment = ({ left, right, current, history }
   let maxScore = 0
 
   if (history && history.length > 0) {
-    maxScore = parseInt(_.last(history)['.key'])
+    maxScore = parseInt(_.last(history).id)
 
     history = history.map(h => {
       const groups = _.groupBy(h.entities.filter(e =>
@@ -409,7 +409,7 @@ export const calculateMovesToBestAssignment = ({ left, right, current, history }
         e.location !== constants.LOCATION.OUT
       ), 'location')
       const lanes = []
-      const score = maxScore - parseInt(h['.key'])
+      const score = maxScore - parseInt(h.id)
 
       Object.values(groups).forEach(entities => {
         entities = entities.map(key)
@@ -440,8 +440,8 @@ export const calculateMovesToBestAssignment = ({ left, right, current, history }
 
   const results = []
   assignment.forEach(a => {
-    const lane = leftEntities.find(e => e['.key'] === leftKeys[a[0][0]]).location
-    if (rightEntities.find(e => e['.key'] === a[1]).location !== lane) {
+    const lane = leftEntities.find(e => e.id === leftKeys[a[0][0]]).location
+    if (rightEntities.find(e => e.id === a[1]).location !== lane) {
       results.push({
         lane,
         entities: [a[1]],

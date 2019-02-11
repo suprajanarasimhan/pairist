@@ -17,30 +17,30 @@ describe('History Store', () => {
     describe('all', () => {
       it('filters history from after currentScaledDate-3', () => {
         const history = [
-          { '.key': '999', 'before': null },
-          { '.key': '1000', 'at': null },
-          { '.key': '1001', 'after': null },
+          { id: '999', before: null },
+          { id: '1000', at: null },
+          { id: '1001', after: null },
         ]
         const currentScaledDate = 1003
 
         expect(store.getters.all({ history }, { currentScaledDate })).toEqual([
-          { '.key': '999', 'before': null, 'entities': [] },
-          { '.key': '1000', 'at': null, 'entities': [] },
+          { id: '999', before: null, entities: [] },
+          { id: '1000', at: null, entities: [] },
         ])
       })
 
       it('adds .key to entities', () => {
         const history = [
           {
-            '.key': '999',
-            'entities': {
+            id: '999',
+            entities: {
               e1: { name: 'name' },
               e2: { name: 'name' },
             },
           },
           {
-            '.key': '1000',
-            'entities': {
+            id: '1000',
+            entities: {
               e3: { name: 'name' },
               e4: { name: 'name' },
             },
@@ -50,17 +50,17 @@ describe('History Store', () => {
 
         expect(store.getters.all({ history }, { currentScaledDate })).toEqual([
           {
-            '.key': '999',
-            'entities': [
-              { '.key': 'e1', 'name': 'name' },
-              { '.key': 'e2', 'name': 'name' },
+            id: '999',
+            entities: [
+              { id: 'e1', name: 'name' },
+              { id: 'e2', name: 'name' },
             ],
           },
           {
-            '.key': '1000',
-            'entities': [
-              { '.key': 'e3', 'name': 'name' },
-              { '.key': 'e4', 'name': 'name' },
+            id: '1000',
+            entities: [
+              { id: 'e3', name: 'name' },
+              { id: 'e4', name: 'name' },
             ],
           },
         ])

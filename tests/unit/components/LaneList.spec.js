@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
+import Vue from 'vue'
 import Vuex from 'vuex'
 import Vuetify from 'vuetify'
 import Lane from '@/components/team/Lane'
@@ -7,7 +8,7 @@ import LaneList from '@/components/team/LaneList'
 const localVue = createLocalVue()
 
 localVue.use(Vuex)
-localVue.use(Vuetify)
+Vue.use(Vuetify)
 
 describe('LaneList', () => {
   let getters
@@ -38,6 +39,6 @@ describe('LaneList', () => {
     const lane = wrapper.find(Lane)
     expect(lane.exists()).toBe(true)
     expect(lane.vm.last).toBe(true)
-    expect(lane.vm.lane).toEqual({ '.key': 'new-lane' })
+    expect(lane.vm.lane).toEqual({ id: 'new-lane' })
   })
 })

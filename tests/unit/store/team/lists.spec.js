@@ -39,14 +39,14 @@ describe('Lists Store', () => {
 
       it('edits an existing list', () => {
         const existingList = {
-          '.key': 'p1',
-          'title': 'john',
+          id: 'p1',
+          title: 'john',
         }
         const update = jest.fn()
         const child = jest.fn().mockReturnValue({ update })
         const state = { lists: [existingList], ref: { child } }
 
-        store.actions.save({ state }, { '.key': 'p1', 'title': 'smith' })
+        store.actions.save({ state }, { id: 'p1', title: 'smith' })
         expect(child).toHaveBeenCalledTimes(1)
         expect(child).toHaveBeenCalledWith('p1')
         expect(update).toHaveBeenCalledTimes(1)
@@ -57,14 +57,14 @@ describe('Lists Store', () => {
 
       it('only submints updated fields', () => {
         const existingList = {
-          '.key': 'p2',
-          'title': 'john',
+          id: 'p2',
+          title: 'john',
         }
         const update = jest.fn()
         const child = jest.fn().mockReturnValue({ update })
         const state = { lists: [existingList], ref: { child } }
 
-        store.actions.save({ state }, { '.key': 'p2', 'title': 'smith' })
+        store.actions.save({ state }, { id: 'p2', title: 'smith' })
         expect(child).toHaveBeenCalledTimes(1)
         expect(child).toHaveBeenCalledWith('p2')
         expect(update).toHaveBeenCalledTimes(1)
@@ -93,7 +93,7 @@ describe('Lists Store', () => {
         const items = jest.fn().mockReturnValue({ push })
         const child = jest.fn().mockReturnValue({ child: items })
         const state = { ref: { child } }
-        const list = { '.key': 'list-key' }
+        const list = { id: 'list-key' }
 
         store.actions.saveItem({ state }, { list, item: { title: 'item' } })
         expect(child).toHaveBeenCalledTimes(1)
@@ -112,9 +112,9 @@ describe('Lists Store', () => {
         const items = jest.fn().mockReturnValue({ child: item })
         const child = jest.fn().mockReturnValue({ child: items })
         const state = { ref: { child } }
-        const list = { '.key': 'list-key' }
+        const list = { id: 'list-key' }
 
-        store.actions.saveItem({ state }, { list, item: { '.key': 'p1', 'title': 'smith' } })
+        store.actions.saveItem({ state }, { list, item: { id: 'p1', title: 'smith' } })
         expect(child).toHaveBeenCalledTimes(1)
         expect(child).toHaveBeenCalledWith('list-key')
         expect(items).toHaveBeenCalledTimes(1)
@@ -136,7 +136,7 @@ describe('Lists Store', () => {
         const items = jest.fn().mockReturnValue({ child: item })
         const child = jest.fn().mockReturnValue({ child: items })
         const state = { ref: { child } }
-        const list = { '.key': 'list-key' }
+        const list = { id: 'list-key' }
 
         store.actions.removeItem({ dispatch, state }, { list, key: 'key' })
         expect(child).toHaveBeenCalledTimes(1)

@@ -1,7 +1,8 @@
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
+import Vue from 'vue'
 import Vuex from 'vuex'
 import Vuetify from 'vuetify'
+import flushPromises from 'flush-promises'
 import Person from '@/components/team/Person'
 import Chip from '@/components/team/Chip'
 import Lane from '@/components/team/Lane'
@@ -9,7 +10,7 @@ import Lane from '@/components/team/Lane'
 const localVue = createLocalVue()
 
 localVue.use(Vuex)
-localVue.use(Vuetify)
+Vue.use(Vuetify)
 
 const addElemWithDataAppToBody = () => {
   const app = document.createElement('div')
@@ -60,7 +61,7 @@ describe('Lane', () => {
   })
 
   it('can be locked and unlocked', async () => {
-    const lane = { '.key': 'a-key', 'locked': false }
+    const lane = { id: 'a-key', locked: false }
     const wrapper = mount(Lane, {
       store,
       localVue,
@@ -95,7 +96,7 @@ describe('Lane', () => {
   it('cannot be locked and unlocked if cannot write', () => {
     getters.canWrite.mockReturnValue(false)
 
-    const lane = { '.key': 'a-key', 'locked': false }
+    const lane = { id: 'a-key', locked: false }
     const wrapper = shallowMount(Lane, {
       store,
       localVue,
@@ -106,7 +107,7 @@ describe('Lane', () => {
   })
 
   it('shows a new lane without a lock button if new-lane is passed', async () => {
-    const lane = { '.key': 'new-lane' }
+    const lane = { id: 'new-lane' }
     const wrapper = shallowMount(Lane, {
       store,
       localVue,
@@ -117,7 +118,7 @@ describe('Lane', () => {
   })
 
   it('can be closed', async () => {
-    const lane = { '.key': 'a-key' }
+    const lane = { id: 'a-key' }
     const wrapper = mount(Lane, {
       store,
       localVue,
@@ -132,7 +133,7 @@ describe('Lane', () => {
   it('cannot be closed if cannot write', () => {
     getters.canWrite.mockReturnValue(false)
 
-    const lane = { '.key': 'a-key' }
+    const lane = { id: 'a-key' }
     const wrapper = shallowMount(Lane, {
       store,
       localVue,
@@ -143,7 +144,7 @@ describe('Lane', () => {
   })
 
   it('shows a new lane without a close button if new-lane is passed', async () => {
-    const lane = { '.key': 'new-lane' }
+    const lane = { id: 'new-lane' }
     const wrapper = mount(Lane, {
       store,
       localVue,
@@ -175,7 +176,7 @@ describe('Lane', () => {
 
   it('renders people', () => {
     const lane = {
-      people: [{ '.key': 'p1' }, { '.key': 'p2' }],
+      people: [{ id: 'p1' }, { id: 'p2' }],
     }
     const wrapper = shallowMount(Lane, {
       store,
@@ -185,13 +186,13 @@ describe('Lane', () => {
 
     const people = wrapper.findAll(Person)
     expect(people.length).toEqual(2)
-    expect(people.wrappers[0].vm.person).toEqual({ '.key': 'p1' })
-    expect(people.wrappers[1].vm.person).toEqual({ '.key': 'p2' })
+    expect(people.wrappers[0].vm.person).toEqual({ id: 'p1' })
+    expect(people.wrappers[1].vm.person).toEqual({ id: 'p2' })
   })
 
   it('renders roles', () => {
     const lane = {
-      roles: [{ '.key': 'r1' }, { '.key': 'r2' }],
+      roles: [{ id: 'r1' }, { id: 'r2' }],
     }
     const wrapper = shallowMount(Lane, {
       store,
@@ -201,13 +202,13 @@ describe('Lane', () => {
 
     const roles = wrapper.findAll(Chip)
     expect(roles.length).toEqual(2)
-    expect(roles.wrappers[0].vm.entity).toEqual({ '.key': 'r1' })
-    expect(roles.wrappers[1].vm.entity).toEqual({ '.key': 'r2' })
+    expect(roles.wrappers[0].vm.entity).toEqual({ id: 'r1' })
+    expect(roles.wrappers[1].vm.entity).toEqual({ id: 'r2' })
   })
 
   it('renders tracks', () => {
     const lane = {
-      tracks: [{ '.key': 't1' }, { '.key': 't2' }],
+      tracks: [{ id: 't1' }, { id: 't2' }],
     }
     const wrapper = shallowMount(Lane, {
       store,
@@ -217,7 +218,7 @@ describe('Lane', () => {
 
     const tracks = wrapper.findAll(Chip)
     expect(tracks.length).toEqual(2)
-    expect(tracks.wrappers[0].vm.entity).toEqual({ '.key': 't1' })
-    expect(tracks.wrappers[1].vm.entity).toEqual({ '.key': 't2' })
+    expect(tracks.wrappers[0].vm.entity).toEqual({ id: 't1' })
+    expect(tracks.wrappers[1].vm.entity).toEqual({ id: 't2' })
   })
 })

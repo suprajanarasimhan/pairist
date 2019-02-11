@@ -8,67 +8,77 @@ export default {
   },
 
   mutations: {
-    setRef (state, ref) { state.ref = ref },
+    setCollection (state, collection) { state.collection = collection },
     ...firebaseMutations,
   },
 
   getters: {
     all (state) {
-      return state.lists
+      return state.lists.map(list => ({
+        id: list.id,
+        ...list,
+      }))
     },
   },
 
   actions: {
-    setRef: firebaseAction(({ bindFirebaseRef, commit }, ref) => {
-      bindFirebaseRef('lists', ref.orderByChild('order'))
-      commit('setRef', ref.ref)
+    setCollection: firebaseAction(({ bindFirebaseRef, commit }, collection) => {
+      bindFirebaseRef('lists', collection.orderBy('order'))
+      commit('setCollection', collection)
     }),
 
-    async saveItem ({ state }, { list, item }) {
-      if (item['.key']) {
-        const key = item['.key']
-        delete item['.key']
-
-        await state.ref.child(list['.key']).child('items').child(key).update(item)
+    async saveItem ({ state }, { list, item, index }) {
+      if (index !== undefined) {
+        const items = list.items
+        items[index] = { ...items[index], ...item }
+        await state.collection.doc(list.id).update({ items })
       } else {
-        await state.ref.child(list['.key']).child('items').push({
-          title: item.title,
-        })
+        const items = list.items
+        items.push({ title: item.title, order: 0 })
+        await state.collection.doc(list.id).update({ items })
       }
     },
 
     reorderLists ({ state }, lists) {
       lists.forEach((list, order) => {
-        state.ref.child(list['.key']).update({ order })
+        state.collection.doc(list.id).update({ order })
       })
     },
 
-    removeItem ({ state }, { list, key }) {
-      state.ref.child(list['.key']).child('items').child(key).remove()
+    async removeItem ({ state }, { list, index }) {
+      const items = list.items
+      items.splice(items.indexOf(index), 1)
+      await state.collection.doc(list.id).update({ items })
     },
 
     save ({ state }, list) {
-      if (list['.key']) {
-        const key = list['.key']
-        delete list['.key']
+      if (list.id) {
+        const key = list.id
+        delete list.id
 
-        state.ref.child(key).update(list)
+        state.collection.doc(key).update(list)
       } else {
-        state.ref.push({
+        state.collection.add({
           title: list.title || '',
           items: [],
+          order: 0,
         })
       }
     },
 
     reorder ({ state }, { list, items }) {
-      items.forEach((item, order) => {
-        state.ref.child(list['.key']).child('items').child(item['.key']).update({ order })
-      })
+      const newItems = items.map((item, order) => (
+        {
+          ...item,
+          order,
+          checked: false,
+        }
+      ))
+      state.collection.doc(list.id).update({ items: newItems })
     },
 
     remove ({ state }, key) {
-      state.ref.child(key).remove()
+      state.collection.doc(key).delete()
     },
   },
 }

@@ -12,14 +12,14 @@ export default {
   },
 
   mutations: {
-    setRef (state, ref) { state.ref = ref },
+    setCollection (state, collection) { state.collection = collection },
     ...firebaseMutations,
   },
 
   getters: {
     byKey (state) {
       return key =>
-        _.find(e => e['.key'] === key)(state.entities)
+        _.find(e => e.id === key)(state.entities)
     },
     all (state) {
       return state.entities
@@ -48,19 +48,19 @@ export default {
   },
 
   actions: {
-    setRef: firebaseAction(({ bindFirebaseRef, commit }, ref) => {
-      bindFirebaseRef('entities', ref)
-      commit('setRef', ref.ref)
+    setCollection: firebaseAction(({ bindFirebaseRef, commit }, collection) => {
+      bindFirebaseRef('entities', collection.orderBy('updatedAt'))
+      commit('setCollection', collection)
     }),
 
     save ({ state }, entity) {
       if (entity.name === '') { return }
 
-      if (entity['.key']) {
-        const key = entity['.key']
-        delete entity['.key']
+      if (entity.id) {
+        const key = entity.id
+        delete entity.id
 
-        state.ref.child(key).update(entity)
+        state.collection.doc(key).update(entity)
       } else {
         const entityToCreate = {
           ...entity,
@@ -68,23 +68,23 @@ export default {
           updatedAt: moment().valueOf(),
         }
 
-        state.ref.push(entityToCreate)
+        state.collection.add(entityToCreate)
       }
     },
 
     remove ({ dispatch, state }, key) {
-      state.ref.child(key).remove()
+      state.collection.doc(key).remove()
       dispatch('lanes/clearEmpty', null, { root: true })
     },
 
     resetLocation ({ getters, dispatch, state }, key) {
       getters.all.filter(e => e.location === key).forEach(e => {
-        dispatch('move', { key: e['.key'], location: constants.LOCATION.UNASSIGNED })
+        dispatch('move', { key: e.id, location: constants.LOCATION.UNASSIGNED })
       })
       dispatch('lanes/clearEmpty', null, { root: true })
     },
 
-    move ({ getters, state }, { key, location }) {
+    async move ({ getters, state }, { key, location }) {
       const entity = getters.byKey(key)
       if (!entity) { return }
 
@@ -97,7 +97,7 @@ export default {
         updatedAt: moment().valueOf(),
       }
 
-      state.ref.child(key).update(payload)
+      await state.collection.doc(key).update(payload)
     },
   },
 }

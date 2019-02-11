@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
+import Vue from 'vue'
 import Vuex from 'vuex'
 import Vuetify from 'vuetify'
 
@@ -9,7 +10,7 @@ import Team from '@/components/team/Team'
 const localVue = createLocalVue()
 
 localVue.use(Vuex)
-localVue.use(Vuetify)
+Vue.use(Vuetify)
 
 const $route = {
   params: {

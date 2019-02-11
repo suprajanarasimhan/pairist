@@ -1,7 +1,7 @@
 <template>
   <transition name="highlight">
     <div
-      :data-key="person['.key']"
+      :data-key="person.id"
       class="person title font-weight-regular person-color"
     >
       <v-btn v-if="canWrite && !dragging" class="edit-hover" color="primary" small @click="edit">

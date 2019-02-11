@@ -43,11 +43,11 @@
           </router-link>
           <router-link
             v-for="h in history"
-            :key="h['.key']"
-            :to="{ name: 'TeamHistory', params: { team: $route.params.team, date: h['.key'] } }"
+            :key="h.id"
+            :to="{ name: 'TeamHistory', params: { team: $route.params.team, date: h.id } }"
             active-class="accent"
           >
-            {{ toDate(h['.key']) | moment("calendar") }}
+            {{ toDate(h.id) | moment("calendar") }}
           </router-link>
         </div>
       </div>

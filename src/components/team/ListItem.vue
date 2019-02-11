@@ -75,7 +75,7 @@ export default {
     },
 
     remove () {
-      this.$emit('remove', this.item['.key'])
+      this.$emit('remove')
     },
   },
 }

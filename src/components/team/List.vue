@@ -23,10 +23,10 @@
     </v-subheader>
 
     <draggable v-model="items" :options="{ handle: '.inner-handle' }">
-      <template v-for="item in items">
-        <ListItem :item="item" :key="item['.key']"
-                  :loading="isLoading(item['.key'])" @update="updateItem"
-                  @remove="removeItem" />
+      <template v-for="(item, index) in items">
+        <ListItem :item="item" :key="index"
+                  :loading="isLoading(index)" @update="updateItem(index, $event)"
+                  @remove="removeItem(index)" />
       </template>
     </draggable>
 
@@ -100,9 +100,7 @@ export default {
       get () {
         if (!this.list.items) { return [] }
 
-        return Object.keys(this.list.items).map((key) =>
-          Object.assign({ '.key': key }, this.list.items[key])
-        ).sort((a, b) => a.order - b.order)
+        return [...this.list.items].sort((a, b) => a.order - b.order)
       },
       set (value) {
         this.$store.dispatch('lists/reorder', { list: this.list, items: value })
@@ -110,7 +108,7 @@ export default {
     },
 
     isLoading () {
-      return (key) => _.includes(key, this.loading)
+      return (index) => _.includes(index, this.loading)
     },
   },
 
@@ -146,14 +144,14 @@ export default {
       this.$refs.newItemEl.clear()
     },
 
-    async updateItem (item) {
-      this.loading.push(item['.key'])
-      await this.$store.dispatch('lists/saveItem', { list: { ...this.list }, item })
-      this.loading.splice(this.loading.indexOf(item['.key']), 1)
+    async updateItem (index, item) {
+      this.loading.push(index)
+      await this.$store.dispatch('lists/saveItem', { list: { ...this.list }, item, index })
+      this.loading.splice(this.loading.indexOf(index), 1)
     },
 
-    removeItem (key) {
-      this.$store.dispatch('lists/removeItem', { list: { ...this.list }, key })
+    removeItem (index) {
+      this.$store.dispatch('lists/removeItem', { list: { ...this.list }, index })
     },
 
     changeTitle (title) {
@@ -162,7 +160,7 @@ export default {
 
     remove () {
       this.dialog = false
-      this.$store.dispatch('lists/remove', this.list['.key'])
+      this.$store.dispatch('lists/remove', this.list.id)
     },
   },
 }

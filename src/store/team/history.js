@@ -10,7 +10,7 @@ export default {
   },
 
   mutations: {
-    setRef (state, ref) { state.ref = ref },
+    setCollection (state, collection) { state.collection = collection },
     ...firebaseMutations,
   },
 
@@ -20,11 +20,11 @@ export default {
       const startDate = getters.currentScaledDate - 3
       const withKey = entities =>
         _.map(key =>
-          _.assign({ '.key': key }, entities[key]),
+          _.assign({ id: key }, entities[key]),
         )(_.keys(entities))
 
       return _.flow(
-        _.filter(_.flow(_.prop('.key'), parseInt, _.lte(_, startDate))),
+        _.filter(_.flow(_.prop('id'), parseInt, _.lte(_, startDate))),
         _.map(h => _.assoc('entities', withKey(h.entities), h)),
       )(state.history)
     },
@@ -35,9 +35,9 @@ export default {
   },
 
   actions: {
-    setRef: firebaseAction(({ bindFirebaseRef, commit }, ref) => {
-      bindFirebaseRef('history', ref)
-      commit('setRef', ref.ref)
+    setCollection: firebaseAction(({ bindFirebaseRef, commit }, collection) => {
+      bindFirebaseRef('history', collection.orderBy('timestamp').limit(100))
+      commit('setCollection', collection)
     }),
   },
 }

@@ -22,7 +22,7 @@
 
         <Chip
           v-for="track in unassigned('track')"
-          :key="track['.key']"
+          :key="track.id"
           :entity="track"
           chip-class="track"
           @remove="remove"
@@ -50,7 +50,7 @@
 
         <Chip
           v-for="role in unassigned('role')"
-          :key="role['.key']"
+          :key="role.id"
           :entity="role"
           chip-class="role"
           @remove="remove"
@@ -77,7 +77,7 @@
         <Person
           v-for="person in unassigned('person')"
           :person="person"
-          :key="person['.key']"
+          :key="person.id"
         />
       </div>
 
@@ -94,7 +94,7 @@
         <Person
           v-for="person in pm('person')"
           :person="person"
-          :key="person['.key']"
+          :key="person.id"
         />
       </div>
 
@@ -111,7 +111,7 @@
         <Person
           v-for="person in out('person')"
           :person="person"
-          :key="person['.key']"
+          :key="person.id"
         />
       </div>
     </div>

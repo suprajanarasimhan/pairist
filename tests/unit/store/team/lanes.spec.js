@@ -27,7 +27,7 @@ describe('Lanes Store', () => {
     describe('all', () => {
       it('returns the lanes from the state with entities from root', () => {
         const lanes = [
-          { '.key': 1 }, { '.key': 2 }, { '.key': 3 },
+          { id: 1 }, { id: 2 }, { id: 3 },
         ]
         const rootGetters = {
           'entities/inLocation': jest.fn().mockImplementation((key) =>
@@ -36,9 +36,9 @@ describe('Lanes Store', () => {
 
         const result = store.getters.all({ lanes }, null, null, rootGetters)
         expect(result).toEqual([
-          { '.key': 1, 'people': { person: 1 }, 'tracks': { track: 1 }, 'roles': { role: 1 } },
-          { '.key': 2, 'people': { person: 2 }, 'tracks': { track: 2 }, 'roles': { role: 2 } },
-          { '.key': 3, 'people': { person: 3 }, 'tracks': { track: 3 }, 'roles': { role: 3 } },
+          { id: 1, people: { person: 1 }, tracks: { track: 1 }, roles: { role: 1 } },
+          { id: 2, people: { person: 2 }, tracks: { track: 2 }, roles: { role: 2 } },
+          { id: 3, people: { person: 3 }, tracks: { track: 3 }, roles: { role: 3 } },
         ])
       })
     })
@@ -121,11 +121,11 @@ describe('Lanes Store', () => {
     describe('clearEmpty', () => {
       it('dispatches remove for any lanes with no entites', () => {
         const lanes = [
-          { '.key': 1, 'people': [], 'tracks': [], 'roles': [] },
-          { '.key': 2, 'people': [2], 'tracks': [], 'roles': [] },
-          { '.key': 3, 'people': [], 'tracks': [3], 'roles': [] },
-          { '.key': 4, 'people': [], 'tracks': [], 'roles': [4] },
-          { '.key': 5, 'people': [5], 'tracks': [5], 'roles': [5] },
+          { id: 1, people: [], tracks: [], roles: [] },
+          { id: 2, people: [2], tracks: [], roles: [] },
+          { id: 3, people: [], tracks: [3], roles: [] },
+          { id: 4, people: [], tracks: [], roles: [4] },
+          { id: 5, people: [5], tracks: [5], roles: [5] },
         ]
         const dispatch = jest.fn()
         const getters = { all: lanes }

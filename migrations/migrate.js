@@ -31,7 +31,7 @@ admin.initializeApp({
   databaseURL: `https://${env}.firebaseio.com`,
 })
 
-const db = admin.database()
+const db = admin.firestore()
 
 const migrationsDir = path.basename(__dirname)
 const migrations = []
@@ -47,7 +47,7 @@ fs.readdirSync(migrationsDir).forEach(file => {
 })
 
 const up = async () => {
-  let currentSchema = (await db.ref('/schema/version').once('value')).val()
+  let currentSchema = (await db.doc('/global/schema').get())
   const targetVersion = migrations[migrations.length - 1].version
   if (currentSchema) {
     const message = 'Current schema version: '.blue +
@@ -67,23 +67,28 @@ const up = async () => {
   }
 
   try {
-    await db.ref('/schema/migrating').set(true)
+    try {
+      await db.doc('/global/schema').update({ migrating: true })
+    } catch (error) {
+      await db.doc('/global/schema').set({ migrating: true })
+    }
 
     for (let i = 0; i < migrations.length; i++) {
       const { name, migration, version } = migrations[i]
       if (version <= currentSchema) { continue }
 
-      const all = (await db.ref().once('value')).val()
-      fs.writeFileSync(`backups/${env}/before-${name}.json`, JSON.stringify(all), 'utf-8')
+      // TODO: export backup
+      // const all = (await db.ref().once('value')).val()
+      // fs.writeFileSync(`backups/${env}/before-${name}.json`, JSON.stringify(all), 'utf-8')
 
       process.stdout.write(`Running ${name.blue}...`)
 
       await migration.up()
-      await db.ref('/schema/version').set(version)
+      await db.doc('/global/schema').update({ version })
       process.stdout.write(' Done!\n'.green)
     }
 
-    await db.ref('/schema/migrating').set(false)
+    await db.doc('/global/schema').update({ migrating: false })
   } catch (error) {
     process.stdout.write('\n'.green)
     console.error('Failed migrating:'.red, error)

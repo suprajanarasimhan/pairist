@@ -6,12 +6,12 @@
       <Lane
         v-for="lane in lanes"
         :lane="lane"
-        :key="lane['.key']"
-        :data-key="lane['.key']"
+        :key="lane.id"
+        :data-key="lane.id"
         class="dropzone"
       />
       <Lane
-        :lane="{'.key': 'new-lane'}"
+        :lane="{id: 'new-lane'}"
         :last="true"
         data-key="new-lane"
         class="dropzone last-lane"

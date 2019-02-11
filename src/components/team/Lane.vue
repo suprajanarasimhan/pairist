@@ -1,8 +1,8 @@
 <template>
   <div
     :class="{
-      'phase-out': dragging && dropTarget !== lane['.key'],
-      'phase-in': dragging && dropTarget === lane['.key'],
+      'phase-out': dragging && dropTarget !== lane.id,
+      'phase-in': dragging && dropTarget === lane.id,
     }"
     class="lane"
   >
@@ -14,7 +14,7 @@
         <Person
           v-for="person in lane.people"
           :person="person"
-          :key="person['.key']"
+          :key="person.id"
         />
       </v-flex>
       <v-flex text-xs-left
@@ -24,26 +24,26 @@
               lg6>
         <Chip
           v-for="role in lane.roles"
-          :key="role['.key']"
+          :key="role.id"
           :entity="role"
           chip-class="role"
         />
         <Chip
           v-for="track in lane.tracks"
-          :key="track['.key']"
+          :key="track.id"
           :entity="track"
           chip-class="track"
         />
       </v-flex>
       <v-tooltip
-        v-if="canWrite && lane['.key'] !== 'new-lane'"
+        v-if="canWrite && lane.id !== 'new-lane'"
         class="lock-button" right>
         <v-btn
           slot="activator"
           :class="{'is-locked': lane.locked}"
           :color="lane.locked? 'pink' : 'accent'"
           dark fab small
-          @click="setLocked({ key: lane['.key'], locked: !lane.locked })"
+          @click="setLocked({ key: lane.id, locked: !lane.locked })"
         >
           <v-icon v-if="lane.locked">mdi-lock</v-icon>
           <v-icon v-else>mdi-lock-open</v-icon>
@@ -52,12 +52,12 @@
         <span v-else>Lock lane</span>
       </v-tooltip>
       <v-tooltip
-        v-if="canWrite && lane['.key'] !== 'new-lane'"
+        v-if="canWrite && lane.id !== 'new-lane'"
         class="sweep-button" right>
         <v-btn
           slot="activator"
           dark fab small
-          @click="sweepLane({ key: lane['.key']})"
+          @click="sweepLane({ key: lane.id})"
         >
           <v-icon>mdi-broom</v-icon>
         </v-btn>

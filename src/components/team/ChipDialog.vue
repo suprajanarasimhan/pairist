@@ -159,7 +159,7 @@ export default {
       await this.$store.dispatch('entities/save', Object.assign({ type: this.editingEntity.type }, this.editingEntity))
 
       this.show = false
-      if (!this.entity['.key']) {
+      if (!this.entity.id) {
         for (let k in this.editingEntity) {
           if (k === 'type') { continue }
           this.editingEntity[k] = ''
@@ -172,7 +172,7 @@ export default {
     },
 
     remove () {
-      this.$store.dispatch('entities/remove', this.entity['.key'])
+      this.$store.dispatch('entities/remove', this.entity.id)
     },
   },
 }

@@ -151,7 +151,7 @@ describe('Team Store', () => {
         const dispatch = jest.fn()
         const state = { teamName: 'my-team' }
         const getters = {
-          'history/all': [{ '.key': '123' }],
+          'history/all': [{ id: '123' }],
         }
 
         store.actions.loadState({ commit, dispatch, state, getters }, 'current')
@@ -169,7 +169,7 @@ describe('Team Store', () => {
         const dispatch = jest.fn()
         const state = { teamName: 'my-team' }
         const getters = {
-          'history/all': [{ '.key': '123' }],
+          'history/all': [{ id: '123' }],
         }
 
         store.actions.loadState({ commit, dispatch, state, getters }, '123')
@@ -258,7 +258,7 @@ describe('Team Store', () => {
       const key = 'chicken'
       const targetKey = 'new-lane'
       const newLaneKey = 'my-favorite-lane'
-      const getters = { 'lanes/lastAddedKey': newLaneKey }
+      const getters = { 'lanes/lastAddedID': newLaneKey }
       const dispatch = jest.fn()
 
       const prom = store.actions.move({ getters, dispatch }, { key, targetKey })
@@ -321,7 +321,7 @@ describe('Team Store', () => {
       it('creates a new lane and moves if necessary', async () => {
         const dispatch = jest.fn()
         const commit = jest.fn()
-        const getters = { 'lanes/lastAddedKey': 'superlane' }
+        const getters = { 'lanes/lastAddedID': 'superlane' }
         const moves = [
           { entities: ['p1', 'p2'], lane: 'new-lane' },
         ]

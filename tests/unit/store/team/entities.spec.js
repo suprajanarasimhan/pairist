@@ -17,8 +17,8 @@ describe('Entities Store', () => {
   describe('getters', () => {
     describe('byKey', () => {
       it('finds one entity with the given key', () => {
-        const a = { '.key': 'a' }
-        const entities = [a, { '.key': 'b' }]
+        const a = { id: 'a' }
+        const entities = [a, { id: 'b' }]
 
         expect(store.getters.byKey({ entities })('a')).toBe(a)
       })
@@ -91,17 +91,17 @@ describe('Entities Store', () => {
 
       it('edits an existing entity', () => {
         const existingEntity = {
-          '.key': 'p1',
-          'name': 'john',
-          'picture': '',
-          'updatedAt': 123,
-          'location': 'l1',
+          id: 'p1',
+          name: 'john',
+          picture: '',
+          updatedAt: 123,
+          location: 'l1',
         }
         const update = jest.fn()
         const child = jest.fn().mockReturnValue({ update })
         const state = { entities: [existingEntity], ref: { child } }
 
-        store.actions.save({ state }, { '.key': 'p1', 'name': 'smith', 'picture': 'picture' })
+        store.actions.save({ state }, { id: 'p1', name: 'smith', picture: 'picture' })
         expect(child).toHaveBeenCalledTimes(1)
         expect(child).toHaveBeenCalledWith('p1')
         expect(update).toHaveBeenCalledTimes(1)
@@ -113,17 +113,17 @@ describe('Entities Store', () => {
 
       it('only submints updated fields', () => {
         const existingEntity = {
-          '.key': 'p2',
-          'name': 'john',
-          'picture': '',
-          'updatedAt': 123,
-          'location': 'l1',
+          id: 'p2',
+          name: 'john',
+          picture: '',
+          updatedAt: 123,
+          location: 'l1',
         }
         const update = jest.fn()
         const child = jest.fn().mockReturnValue({ update })
         const state = { entities: [existingEntity], ref: { child } }
 
-        store.actions.save({ state }, { '.key': 'p2', 'name': 'smith' })
+        store.actions.save({ state }, { id: 'p2', name: 'smith' })
         expect(child).toHaveBeenCalledTimes(1)
         expect(child).toHaveBeenCalledWith('p2')
         expect(update).toHaveBeenCalledTimes(1)
@@ -171,9 +171,9 @@ describe('Entities Store', () => {
       const child = jest.fn().mockReturnValue({ remove })
       const state = { ref: { child } }
       const all = [
-        { '.key': 'foo', 'location': 'thisLocation' },
-        { '.key': 'bar', 'location': 'anotherLocation' },
-        { '.key': 'baz', 'location': 'thisLocation' },
+        { id: 'foo', location: 'thisLocation' },
+        { id: 'bar', location: 'anotherLocation' },
+        { id: 'baz', location: 'thisLocation' },
       ]
       const getters = { all }
 

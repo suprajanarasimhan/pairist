@@ -12,8 +12,8 @@ import version from '@/version'
 
 Vue.use(Vuex)
 
-const schemaRef = db.ref('/schema')
-const configRef = db.ref('/config')
+const schema = db.doc('/global/schema')
+const config = db.doc('/global/config')
 
 export const store = new Vuex.Store({
   modules: {
@@ -66,8 +66,8 @@ export const store = new Vuex.Store({
 
   actions: {
     bindGlobalRefs: firebaseAction(async ({ bindFirebaseRef }) => {
-      bindFirebaseRef('config', configRef)
-      bindFirebaseRef('schema', schemaRef)
+      bindFirebaseRef('config', config)
+      bindFirebaseRef('schema', schema)
     }),
   },
 })

@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
+import Vue from 'vue'
 import Vuex from 'vuex'
 import Vuetify from 'vuetify'
 import Chip from '@/components/team/Chip'
@@ -6,7 +7,7 @@ import Chip from '@/components/team/Chip'
 const localVue = createLocalVue()
 
 localVue.use(Vuex)
-localVue.use(Vuetify)
+Vue.use(Vuetify)
 
 describe('Chip', () => {
   let store
@@ -31,7 +32,7 @@ describe('Chip', () => {
     shallowMount(Chip, { store,
       localVue,
       propsData: {
-        entity: { '.key': 'p1', 'name': 'Bart' },
+        entity: { id: 'p1', name: 'Bart' },
         chipClass: 'chip',
       },
     })

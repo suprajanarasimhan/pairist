@@ -3,7 +3,7 @@
     <ChipView
       :class="[chipClass, 'chip', { balance: entity.balance }]"
       :entity="entity"
-      :data-key="entity['.key']"
+      :data-key="entity.id"
     >
       <v-btn v-if="canWrite" class="edit-hover" fab icon color="primary" depressed small @click="edit">
         <v-icon>edit</v-icon>

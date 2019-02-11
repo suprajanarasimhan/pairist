@@ -24,7 +24,7 @@ export default {
   state: {
     current: null,
     public: null,
-    publicRef: null,
+    teamRef: null,
     canRead: false,
     canWrite: false,
 
@@ -81,26 +81,25 @@ export default {
     loadTeamRefs: firebaseAction(({ bindFirebaseRef, dispatch }, currentRef) => {
       bindFirebaseRef('current', currentRef)
 
-      dispatch('entities/setRef',
-        currentRef.child('entities').orderByChild('updatedAt'))
+      dispatch('entities/setCollection',
+        currentRef.collection('entities'))
 
-      dispatch('lanes/setRef',
-        currentRef.child('lanes'))
+      dispatch('lanes/setCollection',
+        currentRef.collection('lanes'))
     }),
 
     loadTeam: firebaseAction(async ({ bindFirebaseRef, commit, dispatch, state }, teamName) => {
       commit('loading', true)
-      const historyRef = db.ref(`/teams/${teamName}/history`)
-      const publicRef = db.ref(`/teams/${teamName}/public`)
+      const teamRef = db.doc(`/teams/${teamName}`)
 
-      await bindFirebaseRef('public', publicRef)
-      state.publicRef = publicRef.ref
+      await bindFirebaseRef('team', teamRef)
+      state.teamRef = teamRef
 
-      await dispatch('history/setRef',
-        historyRef.orderByKey().limitToLast(100))
+      await dispatch('history/setCollection',
+        db.collection(`/teams/${teamName}/history`))
 
-      await dispatch('lists/setRef',
-        db.ref(`/teams/${teamName}/lists`))
+      await dispatch('lists/setCollection',
+        db.collection(`/teams/${teamName}/lists`))
 
       state.teamName = teamName
       commit('loading', false)
@@ -109,10 +108,10 @@ export default {
     async loadState ({ commit, state, dispatch }, key) {
       commit('loading', true)
       if (key === 'current') {
-        const currentRef = db.ref(`/teams/${state.teamName}/current`)
+        const currentRef = db.doc(`/teams/${state.teamName}/history/current`)
         dispatch('loadTeamRefs', currentRef)
       } else {
-        dispatch('loadTeamRefs', db.ref(`/teams/${state.teamName}/history/${key}`))
+        dispatch('loadTeamRefs', db.doc(`/teams/${state.teamName}/history/${key}`))
       }
 
       state.loadedKey = key
@@ -121,12 +120,13 @@ export default {
 
     async authorize ({ commit }, teamName) {
       try {
-        await db.ref(`/teams/${teamName}/writecheck`).set(0)
+        await db.doc(`/teams/${teamName}`).update({ writecheck: 0 })
         commit('authorize', { read: true, write: true })
         return
       } catch (error) {
+        console.log(error)
         try {
-          await db.ref(`/teams/${teamName}/public`).once('value')
+          await db.doc(`/teams/${teamName}`).get().public
           commit('authorize', { read: true, write: false })
         } catch (error) {
           commit('authorize', { read: false, write: false })
@@ -140,8 +140,11 @@ export default {
 
     async setPublic ({ commit, state }, value) {
       commit('loading', true)
-      await state.publicRef.set(value)
+      await state.teamRef.update({ public: value })
       commit('loading', false)
+    },
+
+    async recordHistory () {
     },
 
     async move ({ getters, dispatch }, { key, targetKey }) {
@@ -149,14 +152,14 @@ export default {
 
       if (targetKey === 'new-lane') {
         await dispatch('lanes/add')
-        location = getters['lanes/lastAddedKey']
+        location = getters['lanes/lastAddedID']
       } else if (targetKey) {
         location = targetKey
       } else {
         location = constants.LOCATION.UNASSIGNED
       }
 
-      dispatch('entities/move', { key, location })
+      await dispatch('entities/move', { key, location })
       dispatch('lanes/clearEmpty')
     },
 
@@ -164,7 +167,7 @@ export default {
       _.forEach(({ entities, lane }) => {
         if (lane === 'new-lane') {
           Promise.resolve(dispatch('lanes/add'))
-          lane = getters['lanes/lastAddedKey']
+          lane = getters['lanes/lastAddedID']
         }
 
         _.forEach(key => {

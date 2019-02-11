@@ -7,12 +7,12 @@ export default {
   state: {
     lanes: [],
 
-    lastAddedKey: null,
+    lastAddedID: null,
   },
 
   mutations: {
-    setRef (state, ref) { state.ref = ref },
-    laneAdded (state, key) { state.lastAddedKey = key },
+    setCollection (state, collection) { state.collection = collection },
+    laneAdded (state, id) { state.lastAddedID = id },
     ...firebaseMutations,
   },
 
@@ -20,40 +20,41 @@ export default {
     all (state, _getters, _rootState, rootGetters) {
       return _.map(lane => (
         {
-          people: rootGetters['entities/inLocation'](lane['.key'])('person'),
-          tracks: rootGetters['entities/inLocation'](lane['.key'])('track'),
-          roles: rootGetters['entities/inLocation'](lane['.key'])('role'),
+          id: lane.id,
+          people: rootGetters['entities/inLocation'](lane.id)('person'),
+          tracks: rootGetters['entities/inLocation'](lane.id)('track'),
+          roles: rootGetters['entities/inLocation'](lane.id)('role'),
           ...lane,
         }
       ))(state.lanes)
     },
 
-    lastAddedKey (state) { return state.lastAddedKey },
+    lastAddedID (state) { return state.lastAddedID },
   },
 
   actions: {
-    setRef: firebaseAction(({ bindFirebaseRef, commit }, ref) => {
-      bindFirebaseRef('lanes', ref)
-      commit('setRef', ref)
+    setCollection: firebaseAction(({ bindFirebaseRef, commit }, collection) => {
+      bindFirebaseRef('lanes', collection)
+      commit('setCollection', collection)
     }),
 
-    add ({ commit, state }) {
-      const key = state.ref.push({ sortOrder: 0 }).key
-      commit('laneAdded', key)
+    async add ({ commit, state }) {
+      const id = (await state.collection.add({ sortOrder: 0 })).id
+      commit('laneAdded', id)
     },
 
     remove ({ state }, key) {
-      state.ref.child(key).remove()
+      state.collection.doc(key).delete()
     },
 
     setLocked ({ state }, { key, locked }) {
-      state.ref.child(key).update({ locked })
+      state.collection.doc(key).update({ locked })
     },
 
     clearEmpty ({ dispatch, getters }) {
       _.forEach(lane => {
         if (lane.people.length === 0 && lane.tracks.length === 0 && lane.roles.length === 0) {
-          dispatch('remove', lane['.key'])
+          dispatch('remove', lane.id)
         }
       }, getters.all)
     },

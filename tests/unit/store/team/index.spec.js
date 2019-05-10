@@ -13,7 +13,7 @@ jest.mock('@/firebase', () => {
   })
 
   const firebaseApp = mocksdk.initializeApp() // can take a path arg to database url
-  const db = firebaseApp.database()
+  const db = firebaseApp.firestore()
 
   global.db = db
 
@@ -22,12 +22,12 @@ jest.mock('@/firebase', () => {
 
 jest.mock('vuexfire', () => {
   return {
-    firebaseAction: (action) => {
+    firestoreAction: (action) => {
       return (stuff, args) => {
         return action(stuff, args)
       }
     },
-    firebaseMutations: {},
+    vuexfireMutations: {},
   }
 })
 
@@ -95,33 +95,33 @@ describe('Team Store', () => {
       it('binds current ref', () => {
         const commit = jest.fn()
         const dispatch = jest.fn()
-        const bindFirebaseRef = jest.fn()
+        const bindFirestoreRef = jest.fn()
 
-        store.actions.loadTeamRefs({ bindFirebaseRef, commit, dispatch, state: {} }, global.db.ref('/teams/my-team/current'))
+        store.actions.loadTeamRefs({ bindFirestoreRef, commit, dispatch, state: {} }, global.db.doc('/teams/my-team/current'))
 
-        expect(bindFirebaseRef).toHaveBeenCalledTimes(1)
-        expect(bindFirebaseRef)
-          .toHaveBeenCalledWith('current', global.db.ref('/teams/my-team/current'))
+        expect(bindFirestoreRef).toHaveBeenCalledTimes(1)
+        expect(bindFirestoreRef)
+          .toHaveBeenCalledWith('current', global.db.doc('/teams/my-team/current'))
       })
 
       it('dispatches ref for child stores', () => {
         const commit = jest.fn()
         const dispatch = jest.fn()
-        const bindFirebaseRef = jest.fn()
+        const bindFirestoreRef = jest.fn()
         const state = {}
 
-        store.actions.loadTeamRefs({ bindFirebaseRef, commit, dispatch, state }, global.db.ref('/teams/my-team/current'))
+        store.actions.loadTeamRefs({ bindFirestoreRef, commit, dispatch, state }, global.db.doc('/teams/my-team/current'))
 
         expect(dispatch)
           .toHaveBeenCalledWith(
             'entities/setRef',
-            global.db.ref('/teams/my-team/current/entities').orderByChild('updatedAt'),
+            global.db.doc('/teams/my-team/current/entities').orderByChild('updatedAt'),
           )
 
         expect(dispatch)
           .toHaveBeenCalledWith(
             'lanes/setRef',
-            global.db.ref('/teams/my-team/current/lanes'),
+            global.db.doc('/teams/my-team/current/lanes'),
           )
       })
     })
@@ -130,18 +130,18 @@ describe('Team Store', () => {
       it('loads refs for team history and public', async () => {
         const commit = jest.fn()
         const dispatch = jest.fn()
-        const bindFirebaseRef = jest.fn()
+        const bindFirestoreRef = jest.fn()
         const state = {}
 
-        await store.actions.loadTeam({ bindFirebaseRef, commit, dispatch, state }, 'my-team')
+        await store.actions.loadTeam({ bindFirestoreRef, commit, dispatch, state }, 'my-team')
         expect(dispatch)
           .toHaveBeenCalledWith(
             'history/setRef',
-            global.db.ref('/teams/my-team/history').orderByKey().limitToLast(100),
+            global.db.doc('/teams/my-team/history').orderByKey().limitToLast(100),
           )
 
-        expect(bindFirebaseRef)
-          .toHaveBeenCalledWith('public', global.db.ref('/teams/my-team/public'))
+        expect(bindFirestoreRef)
+          .toHaveBeenCalledWith('public', global.db.doc('/teams/my-team/public'))
       })
     })
 
@@ -158,7 +158,7 @@ describe('Team Store', () => {
         expect(dispatch)
           .toHaveBeenCalledWith(
             'loadTeamRefs',
-            global.db.ref('/teams/my-team/current'),
+            global.db.doc('/teams/my-team/current'),
           )
 
         expect(state.loadedKey).toEqual('current')
@@ -176,7 +176,7 @@ describe('Team Store', () => {
         expect(dispatch)
           .toHaveBeenCalledWith(
             'loadTeamRefs',
-            global.db.ref('/teams/my-team/history/123'),
+            global.db.doc('/teams/my-team/history/123'),
           )
 
         expect(state.loadedKey).toEqual('123')
@@ -187,7 +187,7 @@ describe('Team Store', () => {
       it('authorizes users with read and write permissions', async () => {
         const commit = jest.fn()
         const prom = store.actions.authorize({ commit }, 'tubers')
-        global.db.ref('/teams/tubers/writecheck').flush()
+        global.db.doc('/teams/tubers/writecheck').flush()
         await prom
 
         expect(commit).toHaveBeenCalledTimes(1)
@@ -196,9 +196,9 @@ describe('Team Store', () => {
 
       it('handles someone being unable to write but able to read', async () => {
         const commit = jest.fn()
-        global.db.ref('/teams/pika/writecheck').failNext('set', new Error('foo'))
-        global.db.ref('/teams/pika/public').autoFlush()
-        global.db.ref('/teams/pika/writecheck').autoFlush()
+        global.db.doc('/teams/pika/writecheck').failNext('set', new Error('foo'))
+        global.db.doc('/teams/pika/public').autoFlush()
+        global.db.doc('/teams/pika/writecheck').autoFlush()
 
         const prom = store.actions.authorize({ commit }, 'pika')
         await prom
@@ -209,10 +209,10 @@ describe('Team Store', () => {
 
       it('handles users who have neither read nor write permissions', async () => {
         const commit = jest.fn()
-        global.db.ref('/teams/chu/writecheck').failNext('set', new Error('write'))
-        global.db.ref('/teams/chu/public').failNext('once', new Error('read'))
-        global.db.ref('/teams/chu/writecheck').autoFlush()
-        global.db.ref('/teams/chu/public').autoFlush()
+        global.db.doc('/teams/chu/writecheck').failNext('set', new Error('write'))
+        global.db.doc('/teams/chu/public').failNext('once', new Error('read'))
+        global.db.doc('/teams/chu/writecheck').autoFlush()
+        global.db.doc('/teams/chu/public').autoFlush()
 
         const prom = store.actions.authorize({ commit }, 'chu')
         await prom
@@ -228,26 +228,26 @@ describe('Team Store', () => {
   })
 
   describe('move', () => {
-    it('moves the entity to the passed location', () => {
+    it('moves the entity to the passed location', async () => {
       const key = 'entity-key'
       const targetKey = 'target-key'
       const getters = jest.fn()
       const dispatch = jest.fn()
 
-      store.actions.move({ getters, dispatch }, { key, targetKey })
+      await store.actions.move({ getters, dispatch }, { key, targetKey })
 
       expect(dispatch).toHaveBeenCalledTimes(2)
       expect(dispatch).toHaveBeenCalledWith('entities/move', { key, location: targetKey })
       expect(dispatch).toHaveBeenCalledWith('lanes/clearEmpty')
     })
 
-    it('moves entity to unassigned if target is falsy', () => {
+    it('moves entity to unassigned if target is falsy', async () => {
       const key = 'carrot'
       const targetKey = null
       const getters = jest.fn()
       const dispatch = jest.fn()
 
-      store.actions.move({ getters, dispatch }, { key, targetKey })
+      await store.actions.move({ getters, dispatch }, { key, targetKey })
 
       expect(dispatch).toHaveBeenCalledTimes(2)
       expect(dispatch).toHaveBeenCalledWith('entities/move', { key, location: constants.LOCATION.UNASSIGNED })

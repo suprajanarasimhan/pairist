@@ -1,4 +1,4 @@
-import { firebaseMutations, firebaseAction } from 'vuexfire'
+import { vuexfireMutations, firestoreAction } from 'vuexfire'
 
 export default {
   namespaced: true,
@@ -9,7 +9,7 @@ export default {
 
   mutations: {
     setCollection (state, collection) { state.collection = collection },
-    ...firebaseMutations,
+    ...vuexfireMutations,
   },
 
   getters: {
@@ -22,8 +22,8 @@ export default {
   },
 
   actions: {
-    setCollection: firebaseAction(({ bindFirebaseRef, commit }, collection) => {
-      bindFirebaseRef('lists', collection.orderBy('order'))
+    setCollection: firestoreAction(({ bindFirestoreRef, commit }, collection) => {
+      bindFirestoreRef('lists', collection.orderBy('order'))
       commit('setCollection', collection)
     }),
 

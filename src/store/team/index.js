@@ -1,4 +1,4 @@
-import { firebaseAction } from 'vuexfire'
+import { firestoreAction } from 'vuexfire'
 import _ from 'lodash/fp'
 
 import { db } from '@/firebase'
@@ -78,8 +78,8 @@ export default {
   },
 
   actions: {
-    loadTeamRefs: firebaseAction(({ bindFirebaseRef, dispatch }, currentRef) => {
-      bindFirebaseRef('current', currentRef)
+    loadTeamRefs: firestoreAction(({ bindFirestoreRef, dispatch }, currentRef) => {
+      bindFirestoreRef('current', currentRef)
 
       dispatch('entities/setCollection',
         currentRef.collection('entities'))
@@ -88,11 +88,11 @@ export default {
         currentRef.collection('lanes'))
     }),
 
-    loadTeam: firebaseAction(async ({ bindFirebaseRef, commit, dispatch, state }, teamName) => {
+    loadTeam: firestoreAction(async ({ bindFirestoreRef, commit, dispatch, state }, teamName) => {
       commit('loading', true)
       const teamRef = db.doc(`/teams/${teamName}`)
 
-      await bindFirebaseRef('team', teamRef)
+      await bindFirestoreRef('team', teamRef)
       state.teamRef = teamRef
 
       await dispatch('history/setCollection',

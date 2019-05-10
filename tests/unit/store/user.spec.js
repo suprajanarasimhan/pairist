@@ -22,12 +22,12 @@ jest.mock('@/firebase', () => {
 
 jest.mock('vuexfire', () => {
   return {
-    firebaseAction: (action) => {
+    firestoreAction: (action) => {
       return (stuff, args) => {
         return action(stuff, args)
       }
     },
-    firebaseMutations: {},
+    vuexfireMutations: {},
   }
 })
 

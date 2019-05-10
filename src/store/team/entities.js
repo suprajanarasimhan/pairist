@@ -1,4 +1,4 @@
-import { firebaseMutations, firebaseAction } from 'vuexfire'
+import { vuexfireMutations, firestoreAction } from 'vuexfire'
 import _ from 'lodash/fp'
 import moment from 'moment'
 
@@ -13,7 +13,7 @@ export default {
 
   mutations: {
     setCollection (state, collection) { state.collection = collection },
-    ...firebaseMutations,
+    ...vuexfireMutations,
   },
 
   getters: {
@@ -48,8 +48,8 @@ export default {
   },
 
   actions: {
-    setCollection: firebaseAction(({ bindFirebaseRef, commit }, collection) => {
-      bindFirebaseRef('entities', collection.orderBy('updatedAt'))
+    setCollection: firestoreAction(({ bindFirestoreRef, commit }, collection) => {
+      bindFirestoreRef('entities', collection.orderBy('updatedAt'))
       commit('setCollection', collection)
     }),
 

@@ -13,12 +13,12 @@ describe('Lanes Store', () => {
     })
 
     describe('laneAdded', () => {
-      it('sets lastAddedKey state', () => {
-        const lastAddedKey = { lastAddedKey: 'lastAddedKey' }
+      it('sets lastAddedID state', () => {
+        const lastAddedID = { lastAddedID: 'lastAddedID' }
         const state = {}
 
-        store.mutations.laneAdded(state, lastAddedKey)
-        expect(state.lastAddedKey).toBe(lastAddedKey)
+        store.mutations.laneAdded(state, lastAddedID)
+        expect(state.lastAddedID).toBe(lastAddedID)
       })
     })
   })
@@ -43,33 +43,33 @@ describe('Lanes Store', () => {
       })
     })
 
-    describe('lastAddedKey', () => {
+    describe('lastAddedID', () => {
       it('returns the last added key', () => {
-        const lastAddedKey = { lastAddedKey: 'lastAddedKey' }
+        const lastAddedID = { lastAddedID: 'lastAddedID' }
 
-        expect(store.getters.lastAddedKey({ lastAddedKey })).toBe(lastAddedKey)
+        expect(store.getters.lastAddedID({ lastAddedID })).toBe(lastAddedID)
       })
     })
   })
 
   describe('actions', () => {
     describe('add', () => {
-      it('pushes the lane into the ref', () => {
-        const push = jest.fn().mockReturnValue({ key: 'the-key' })
+      it('pushes the lane into the ref', async () => {
+        const add = jest.fn().mockReturnValue({ id: 'the-key' })
         const commit = jest.fn()
-        const state = { ref: { push } }
+        const state = { ref: { add } }
 
-        store.actions.add({ commit, state })
-        expect(push).toHaveBeenCalledTimes(1)
-        expect(push).toHaveBeenCalledWith({ sortOrder: 0 })
+        await store.actions.add({ commit, state })
+        expect(add).toHaveBeenCalledTimes(1)
+        expect(add).toHaveBeenCalledWith({ sortOrder: 0 })
       })
 
-      it('commits the lane back to added', () => {
-        const push = jest.fn().mockReturnValue({ key: 'the-key' })
+      it('commits the lane back to added', async () => {
+        const add = jest.fn().mockReturnValue({ id: 'the-key' })
         const commit = jest.fn()
-        const state = { ref: { push } }
+        const state = { ref: { add } }
 
-        store.actions.add({ commit, state }, { name: '' })
+        await store.actions.add({ commit, state }, { name: '' })
         expect(commit).toHaveBeenCalledTimes(1)
         expect(commit).toHaveBeenCalledWith('laneAdded', 'the-key')
       })
@@ -79,12 +79,12 @@ describe('Lanes Store', () => {
       it('removes lane from ref', () => {
         const dispatch = jest.fn()
         const remove = jest.fn()
-        const child = jest.fn().mockReturnValue({ remove })
-        const state = { ref: { child } }
+        const doc = jest.fn().mockReturnValue({ delete: remove })
+        const state = { ref: { doc } }
 
         store.actions.remove({ dispatch, state }, 'key')
-        expect(child).toHaveBeenCalledTimes(1)
-        expect(child).toHaveBeenCalledWith('key')
+        expect(doc).toHaveBeenCalledTimes(1)
+        expect(doc).toHaveBeenCalledWith('key')
         expect(remove).toHaveBeenCalledTimes(1)
         expect(remove).toHaveBeenCalledWith()
       })
@@ -94,12 +94,12 @@ describe('Lanes Store', () => {
       it('sets the locked value (false)', () => {
         const dispatch = jest.fn()
         const update = jest.fn()
-        const child = jest.fn().mockReturnValue({ update })
-        const state = { ref: { child } }
+        const doc = jest.fn().mockReturnValue({ update })
+        const state = { ref: { doc } }
 
         store.actions.setLocked({ dispatch, state }, { key: 'key', locked: false })
-        expect(child).toHaveBeenCalledTimes(1)
-        expect(child).toHaveBeenCalledWith('key')
+        expect(doc).toHaveBeenCalledTimes(1)
+        expect(doc).toHaveBeenCalledWith('key')
         expect(update).toHaveBeenCalledTimes(1)
         expect(update).toHaveBeenCalledWith({ locked: false })
       })
@@ -107,12 +107,12 @@ describe('Lanes Store', () => {
       it('sets the locked value (true)', () => {
         const dispatch = jest.fn()
         const update = jest.fn()
-        const child = jest.fn().mockReturnValue({ update })
-        const state = { ref: { child } }
+        const doc = jest.fn().mockReturnValue({ update })
+        const state = { ref: { doc } }
 
         store.actions.setLocked({ dispatch, state }, { key: 'other-key', locked: true })
-        expect(child).toHaveBeenCalledTimes(1)
-        expect(child).toHaveBeenCalledWith('other-key')
+        expect(doc).toHaveBeenCalledTimes(1)
+        expect(doc).toHaveBeenCalledWith('other-key')
         expect(update).toHaveBeenCalledTimes(1)
         expect(update).toHaveBeenCalledWith({ locked: true })
       })

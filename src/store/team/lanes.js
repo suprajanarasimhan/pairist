@@ -1,4 +1,4 @@
-import { firebaseMutations, firebaseAction } from 'vuexfire'
+import { vuexfireMutations, firestoreAction } from 'vuexfire'
 import _ from 'lodash/fp'
 
 export default {
@@ -11,9 +11,9 @@ export default {
   },
 
   mutations: {
-    setCollection (state, collection) { state.collection = collection },
+    setRef (state, ref) { state.ref = ref },
     laneAdded (state, id) { state.lastAddedID = id },
-    ...firebaseMutations,
+    ...vuexfireMutations,
   },
 
   getters: {
@@ -33,22 +33,22 @@ export default {
   },
 
   actions: {
-    setCollection: firebaseAction(({ bindFirebaseRef, commit }, collection) => {
-      bindFirebaseRef('lanes', collection)
-      commit('setCollection', collection)
+    setRef: firestoreAction(({ bindFirestoreRef, commit }, ref) => {
+      bindFirestoreRef('lanes', ref)
+      commit('setRef', ref)
     }),
 
     async add ({ commit, state }) {
-      const id = (await state.collection.add({ sortOrder: 0 })).id
+      const id = (await state.ref.add({ sortOrder: 0 })).id
       commit('laneAdded', id)
     },
 
     remove ({ state }, key) {
-      state.collection.doc(key).delete()
+      state.ref.doc(key).delete()
     },
 
     setLocked ({ state }, { key, locked }) {
-      state.collection.doc(key).update({ locked })
+      state.ref.doc(key).update({ locked })
     },
 
     clearEmpty ({ dispatch, getters }) {

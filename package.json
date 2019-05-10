@@ -36,10 +36,10 @@
     "pre-commit": "chmod a-w migrations/*.migration.js && lint-staged"
   },
   "dependencies": {
-    "@firebase/app-types": "^0.3.3",
+    "@firebase/app-types": "^0.4.0",
     "babel-polyfill": "^6.26.0",
     "big-integer": "^1.6.41",
-    "firebase": "^5.8.2",
+    "firebase": "^6.0.1",
     "firebase-admin": "^7.0.0",
     "firebase-functions": "^2.2.0",
     "immutable": "^4.0.0-rc.9",
@@ -84,7 +84,7 @@
     "rimraf": "^2.6.3",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "vue-cli-plugin-vuetify": "^0.4.6",
+    "vue-cli-plugin-vuetify": "^0.5.0",
     "vue-server-renderer": "^2.6.1",
     "vue-template-compiler": "^2.6.1",
     "vuetify-loader": "^1.2.0"

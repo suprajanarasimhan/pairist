@@ -13,6 +13,15 @@
       <div v-else>
         {{ list.title }}
       </div>
+
+      <v-btn
+        v-if="canWrite"
+        icon ripple class="remove-checked"
+        @click="removeChecked"
+      >
+        <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
+      </v-btn>
+
       <v-btn
         v-if="canWrite"
         icon ripple class="remove-list"
@@ -163,6 +172,16 @@ export default {
     remove () {
       this.dialog = false
       this.$store.dispatch('lists/remove', this.list['.key'])
+    },
+
+    removeChecked () {
+      for (let item of this.items) {
+        if (item['checked'] !== undefined && item['checked'] === true) {
+          console.log('Attempting to delete checked item ...')
+          let key = item['.key']
+          this.$store.dispatch('lists/removeItem', { listKey: this.list['.key'], key: key }, key)
+        }
+      }
     },
   },
 }
